@@ -37,10 +37,9 @@ return [
 
     'izipay' => [
         'url' => env('IZIPAY_URL'),
-        'client_id' => env('IZIPAY_CLIENT_ID'),
+        'clien_id' => env('IZIPAY_CLIENT_ID'),
         'client_secret' => env('IZIPAY_CLIENT_SECRET'),
         'public_key' => env('IZIPAY_PUBLIC_KEY'),
         'hash_key' => env('IZIPAY_HASH_KEY'),
     ]
-
 ];

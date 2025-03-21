@@ -17,18 +17,21 @@ class DashboardController extends Controller
 
     public function generateFormToken()
     {
-        $auth = base64_encode(config('services.izipay.client_id') . ':' . config('services.izipay.client_secret'));
+        $auth = base64_encode(config('services.izipay.clien_id') . ':' . config('services.izipay.client_secret'));
 
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . $auth,
-        ])->post(config('services.izipay.url'), [
+            'Content-Type' => 'application/json',
+        ])
+        ->post(config('services.izipay.url'), [
             'amount' => 10000,
             'currency' => 'USD',
             'orderId' => Str::random(10),
             'customer' => [
                 'email' => auth()->user()->email,
             ]
-        ])->json();
+        ])
+        ->json();
 
         return $response['answer']['formToken'];
     }
