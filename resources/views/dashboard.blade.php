@@ -19,6 +19,36 @@
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+
+            @if (session('niubiz'))
+
+                @php
+                    $data = session('niubiz')['response'];
+                    $purchaseNumber = session('niubiz')['purchaseNumber'];
+                @endphp
+                
+                <div class="mb-4">
+                    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                        <span class="font-medium">{{$data['data']['ACTION_DESCRIPTION']}}</span>
+                    </div>
+
+                    <p>
+                        <b>Número de pedido: </b> {{$purchaseNumber}}
+                    </p>
+
+                    <p>
+                        <b>Fecha y hora de pedido: </b> {{ now()->createFromFormat('ymdHis', $data['data']['TRANSACTION_DATE'])->format('d-m-Y H:i:s') }}
+                    </p>
+
+                    <p>
+                        <b>Tarjeta: </b> {{$data['data']['CARD']}} ({{$data['data']['BRAND']}})
+                    </p>
+
+                </div>
+
+            @endif
+
+
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                 <div class="mb-2">
                     <p>
@@ -27,7 +57,7 @@
 
                     <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
                         role="alert">
-                        <span class="font-medium">100 USD</span> Change a few things up and try submitting again.
+                        <span class="font-medium">100 USD</span>
                     </div>
                 </div>
 

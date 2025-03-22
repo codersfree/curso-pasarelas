@@ -62,7 +62,9 @@ class PaidController extends Controller
             return redirect()->route('gracias');
 
         }else{
-            // Pago no se realizó
+            
+            return redirect()->route('dashboard');
+
         }
         
 
