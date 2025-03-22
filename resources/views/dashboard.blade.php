@@ -106,17 +106,20 @@
         <script>
 
             document.addEventListener('DOMContentLoaded', function(event) {
+
+                let purchasenumber = Math.floor(Math.random() * 1000000000);
+
                 VisanetCheckout.configure({
                     sessiontoken: '{{ $sessionToken }}',
                     channel: 'web',
                     merchantid: "{{ config('services.niubiz.merchant_id') }}",
-                    purchasenumber: Math.floor(Math.random() * 1000000000),
+                    purchasenumber: purchasenumber,
                     amount: 100,
                     expirationminutes: '20',
                     timeouturl: "{{ route('dashboard') }}",
                     merchantlogo: 'img/comercio.png',
                     formbuttoncolor: '#000000',
-                    action: "{{ route('paid.niubiz') }}",
+                    action: "{{ route('paid.niubiz') }}" + "?purchasenumber=" + purchasenumber + "&amount=100",
                     complete: function(params) {
                         alert(JSON.stringify(params));
                     }
