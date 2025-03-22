@@ -43,12 +43,31 @@ class DashboardController extends Controller
     {
         $auth = base64_encode(config('services.niubiz.user') . ':' . config('services.niubiz.password'));
 
-        $response = Http::withHeaders([
+        $accessToken = Http::withHeaders([
             'Authorization' => 'Basic ' . $auth,
         ])
-        ->get(config('services.niubiz.url_api'))
+        ->get(config('services.niubiz.url_api') . '/api.security/v1/security')
         ->body();
 
-        return $response;
+        $seesionToken = Http::withHeaders([
+            'Authorization' => $accessToken,
+            'Content-Type' => 'application/json',
+        ])
+        ->post(config('services.niubiz.url_api') . '/api.ecommerce/v2/ecommerce/token/session/' . config('services.niubiz.merchant_id'), [
+            'channel' => 'web',
+            'amount' => 100,
+            'antifraud' => [
+                'clientIp' => request()->ip(),
+                'merchantDefineData' => [
+                    'MDD4' => auth()->user()->email,
+                    'MDD21' => 0,
+                    'MDD32' => auth()->id(),
+                    'MDD75' => 'Registrado',
+                    'MDD77' => now()->diffInDays(auth()->user()->created_at) + 1,
+                ],
+            ]
+        ])->json();
+
+        return $seesionToken['sessionKey'];
     }
 }
