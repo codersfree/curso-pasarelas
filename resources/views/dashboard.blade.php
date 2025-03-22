@@ -91,14 +91,14 @@
                         </li>
 
                         {{-- PayPal --}}
-                        <li x-data="{ open: false }">
+                        <li x-data="{ open: true }">
                             <button class="w-full flex justify-center bg-gray-100 py-2 rounded-lg shadow"
                                 x-on:click="open = !open">
                                 <img class="h-8" src="https://codersfree.com/img/payments/paypal.png" alt="">
                             </button>
 
                             <div class="pt-6 mb-4" x-show="open" style="display: none;">
-                                <p>Aquí se mostrará las opciones de PayPal</p>
+                                <div id="paypal-button-container"></div>
                             </div>
                         </li>
 
@@ -129,10 +129,9 @@
     </div>
 
     @push('js')
-
-        {{-- <script type="text/javascript" src="{{ config('services.niubiz.url_js') }}"></script> --}}
-        <script type="text/javascript" src="https://static-content-qas.vnforapps.com/env/sandbox/js/checkout.js"></script>
-
+        
+        {{-- Izipay --}}
+        <script type="text/javascript" src="{{ config('services.niubiz.url_js') }}"></script>
         <script>
 
             document.addEventListener('DOMContentLoaded', function(event) {
@@ -155,6 +154,39 @@
                     }
                 });
             });
+        </script>
+
+        {{-- SDK PayPal --}}
+        <script src="https://www.paypal.com/sdk/js?client-id={{ config('services.paypal.client_id') }}&currency=USD"></script>
+        <script>
+            //Boton de pago PayPal
+            paypal.Buttons({
+                // El pedido se crea en el servidor y se devuelve el ID del pedido.
+                createOrder() {
+
+                    return axios.post("{{route('paid.createPaypalOrder')}}")
+                        .then(function(response) {
+                            return response.data.id;
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                },
+
+                // Finalizar la transacción en el servidor después de la aprobación del pagador
+                onApprove(data) {
+
+                    return axios.post("{{route('paid.capturePaypalOrder')}}", {
+                            orderID: data.orderID
+                        }).then(function(response) {
+                            window.location.href = "{{ route('gracias') }}";
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                }
+                
+            }).render('#paypal-button-container');
         </script>
     @endpush
 

@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             '/paid/izipay',
             '/paid/niubiz',
+            '/paid/createPaypalOrder',
+            '/paid/capturePaypalOrder',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

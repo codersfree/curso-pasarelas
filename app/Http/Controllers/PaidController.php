@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -69,5 +70,84 @@ class PaidController extends Controller
         
 
         return $response;
+    }
+
+    public function createPaypalOrder()
+    {
+        $accessToken = $this->generateAccessToken();
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Authorization' => "Bearer $accessToken",
+        ])->post(config('services.paypal.url')."/v2/checkout/orders", [
+            'intent' => 'CAPTURE',
+            'purchase_units' => [
+                [
+                    'amount' => [
+                        'currency_code' => 'USD',
+                        'value' => 100,
+                        /* 'breakdown' => [
+                            'item_total' => [
+                                'currency_code' => 'USD',
+                                'value' => 100,
+                            ],
+                            'discount' => [
+                                'currency_code' => 'USD',
+                                'value' => 0,
+                            ]
+                        ] */
+                    ],
+                    /* 'description' => 'Compra de prueba',
+                    "items" => [
+                        [
+                            "name" => "Producto 1",
+                            "unit_amount" => [
+                                "currency_code" => "USD",
+                                "value" => 100,
+                            ],
+                            "quantity" => 1,
+                        ],
+                    ] */
+            
+                ],
+            ],
+        ])->json();
+
+        return $response;
+    }
+
+    public function capturePaypalOrder(Request $request)
+    {
+        $orderId = $request->input('orderID');
+
+        $accessToken = $this->generateAccessToken();
+        /* $url = config('services.paypal.url') . "/v2/checkout/orders/{$orderId}/capture"; */
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Authorization' => "Bearer $accessToken",
+        ])->post(config('services.paypal.url') . "/v2/checkout/orders/{$orderId}/capture", [
+            'intent' => 'CAPTURE',
+        ])->json();
+
+        if (!isset($response['status']) || $response['status'] !== 'COMPLETED') {
+            throw new Exception('Error al capturar la orden de PayPal: ' . json_encode($response));
+        }
+
+        return $response;
+    }
+
+    public function generateAccessToken()
+    {
+        $auth = base64_encode(config('services.paypal.client_id').':'. config('services.paypal.client_secret'));
+        $url = config('services.paypal.url') . "/v1/oauth2/token";
+
+        $response = Http::asForm()->withHeaders([
+            'Authorization' => "Basic $auth",
+        ])->post($url, [
+            'grant_type' => 'client_credentials',
+        ])->json();
+
+        return $response['access_token'];
     }
 }
