@@ -11,6 +11,9 @@ class DashboardController extends Controller
     public function index()
     {
         $formToken = $this->generateFormToken();
+        $sessionToken = $this->generateSessionToken();
+
+        return $sessionToken;
 
         return view('dashboard', compact('formToken'));
     }
@@ -34,5 +37,18 @@ class DashboardController extends Controller
         ->json();
 
         return $response['answer']['formToken'];
+    }
+
+    public function generateSessionToken()
+    {
+        $auth = base64_encode(config('services.niubiz.user') . ':' . config('services.niubiz.password'));
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $auth,
+        ])
+        ->get(config('services.niubiz.url_api'))
+        ->body();
+
+        return $response;
     }
 }

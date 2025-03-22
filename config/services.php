@@ -41,5 +41,14 @@ return [
         'client_secret' => env('IZIPAY_CLIENT_SECRET'),
         'public_key' => env('IZIPAY_PUBLIC_KEY'),
         'hash_key' => env('IZIPAY_HASH_KEY'),
+    ],
+
+    'niubiz' => [
+        'merchant_id' => env('NIUBIZ_MERCHANT_ID'),
+        'currency' => env('NIUBIZ_CURRENCY'),
+        'user' => env('NIUBIZ_USER'),
+        'password' => env('NIUBIZ_PASSWORD'),
+        'url_api' => env('NIUBIZ_URL_API'),
+        'url_js' => env('NIUBIZ_URL_JS'),
     ]
 ];
