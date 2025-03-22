@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
             '/paid/izipay',
+            '/paid/niubiz',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

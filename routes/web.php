@@ -16,5 +16,6 @@ Route::middleware([
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::post('/paid/izipay', [PaidController::class, 'izipay'])->name('paid.izipay');
+    Route::post('/paid/niubiz', [PaidController::class, 'niubiz'])->name('paid.niubiz');
 
 });

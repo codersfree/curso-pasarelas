@@ -17,6 +17,8 @@
         <!-- Styles -->
         @livewireStyles
 
+        @stack('css')
+
         @stack('head')
     </head>
     <body class="font-sans antialiased">
@@ -43,5 +45,8 @@
         @stack('modals')
 
         @livewireScripts
+
+        @stack('js')
+
     </body>
 </html>

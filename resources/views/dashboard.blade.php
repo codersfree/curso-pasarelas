@@ -3,8 +3,8 @@
     @push('head')
         <script type="text/javascript"
             src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js"
-            kr-public-key="{{ config('services.izipay.public_key') }}"
-            kr-post-url-success="{{route('paid.izipay')}}" ;></script>
+            kr-public-key="{{ config('services.izipay.public_key') }}" kr-post-url-success="{{ route('paid.izipay') }}" ;>
+        </script>
 
         <!-- 3 : theme néon should be loaded in the HEAD section   -->
         <link rel="stylesheet" href="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon-reset.min.css">
@@ -45,15 +45,16 @@
                             </button>
 
                             <div class="pt-6 mb-4 flex justify-center" x-show="open" style="display: none;">
-                                
+
                                 <div class="kr-embedded" kr-form-token="{{ $formToken }}">
 
-                            </div>
+                                </div>
                         </li>
 
                         {{-- Niubiz --}}
                         <li>
-                            <button class="w-full flex justify-center bg-gray-100 py-2 rounded-lg shadow">
+                            <button class="w-full flex justify-center bg-gray-100 py-2 rounded-lg shadow"
+                                onclick="VisanetCheckout.open()">
                                 <img class="h-8" src="https://proveedores.niubiz.com.pe/assets/media/logos/logo.png"
                                     alt="">
                             </button>
@@ -96,4 +97,32 @@
             </div>
         </div>
     </div>
+
+    @push('js')
+
+        {{-- <script type="text/javascript" src="{{ config('services.niubiz.url_js') }}"></script> --}}
+        <script type="text/javascript" src="https://static-content-qas.vnforapps.com/env/sandbox/js/checkout.js"></script>
+
+        <script>
+
+            document.addEventListener('DOMContentLoaded', function(event) {
+                VisanetCheckout.configure({
+                    sessiontoken: '{{ $sessionToken }}',
+                    channel: 'web',
+                    merchantid: "{{ config('services.niubiz.merchant_id') }}",
+                    purchasenumber: Math.floor(Math.random() * 1000000000),
+                    amount: 100,
+                    expirationminutes: '20',
+                    timeouturl: "{{ route('dashboard') }}",
+                    merchantlogo: 'img/comercio.png',
+                    formbuttoncolor: '#000000',
+                    action: "{{ route('paid.niubiz') }}",
+                    complete: function(params) {
+                        alert(JSON.stringify(params));
+                    }
+                });
+            });
+        </script>
+    @endpush
+
 </x-app-layout>

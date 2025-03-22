@@ -22,4 +22,9 @@ class PaidController extends Controller
 
         return "OK";
     }
+
+    public function niubiz()
+    {
+        return "Processing...";
+    }
 }
