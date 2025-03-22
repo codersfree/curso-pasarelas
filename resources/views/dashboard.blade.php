@@ -4,7 +4,7 @@
         <script type="text/javascript"
             src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js"
             kr-public-key="{{ config('services.izipay.public_key') }}"
-            kr-post-url-success="/" ;></script>
+            kr-post-url-success="{{route('paid.izipay')}}" ;></script>
 
         <!-- 3 : theme néon should be loaded in the HEAD section   -->
         <link rel="stylesheet" href="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/neon-reset.min.css">
