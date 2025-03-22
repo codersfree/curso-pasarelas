@@ -18,4 +18,8 @@ Route::middleware([
     Route::post('/paid/izipay', [PaidController::class, 'izipay'])->name('paid.izipay');
     Route::post('/paid/niubiz', [PaidController::class, 'niubiz'])->name('paid.niubiz');
 
+    Route::get('/gracias', function () {
+        return view('gracias');
+    })->name('gracias');
+
 });

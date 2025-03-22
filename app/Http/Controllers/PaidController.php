@@ -51,8 +51,16 @@ class PaidController extends Controller
             ])
             ->json();
 
+        session()->flash('niubiz', [
+            'response' => $response,
+            'purchaseNumber' => $request->purchasenumber,
+        ]);
+
         if (isset($response['dataMap']) && $response['dataMap']['ACTION_CODE'] === '000') {
             // Pago se realizó satisfactoriamente
+
+            return redirect()->route('gracias');
+
         }else{
             // Pago no se realizó
         }
