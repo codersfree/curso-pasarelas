@@ -13,9 +13,7 @@ class DashboardController extends Controller
         $formToken = $this->generateFormToken();
         $sessionToken = $this->generateSessionToken();
 
-        return $sessionToken;
-
-        return view('dashboard', compact('formToken'));
+        return view('dashboard', compact('formToken', 'sessionToken'));
     }
 
     public function generateFormToken()
