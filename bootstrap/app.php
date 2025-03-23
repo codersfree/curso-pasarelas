@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             '/paid/izipay',
             '/paid/niubiz',
+            '/webhooks/mercadopago',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

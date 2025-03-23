@@ -21,31 +21,31 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
             @if (session('niubiz'))
-
                 @php
                     $data = session('niubiz')['response'];
                     $purchaseNumber = session('niubiz')['purchaseNumber'];
                 @endphp
-                
+
                 <div class="mb-4">
-                    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-                        <span class="font-medium">{{$data['data']['ACTION_DESCRIPTION']}}</span>
+                    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+                        role="alert">
+                        <span class="font-medium">{{ $data['data']['ACTION_DESCRIPTION'] }}</span>
                     </div>
 
                     <p>
-                        <b>Número de pedido: </b> {{$purchaseNumber}}
+                        <b>Número de pedido: </b> {{ $purchaseNumber }}
                     </p>
 
                     <p>
-                        <b>Fecha y hora de pedido: </b> {{ now()->createFromFormat('ymdHis', $data['data']['TRANSACTION_DATE'])->format('d-m-Y H:i:s') }}
+                        <b>Fecha y hora de pedido: </b>
+                        {{ now()->createFromFormat('ymdHis', $data['data']['TRANSACTION_DATE'])->format('d-m-Y H:i:s') }}
                     </p>
 
                     <p>
-                        <b>Tarjeta: </b> {{$data['data']['CARD']}} ({{$data['data']['BRAND']}})
+                        <b>Tarjeta: </b> {{ $data['data']['CARD'] }} ({{ $data['data']['BRAND'] }})
                     </p>
 
                 </div>
-
             @endif
 
 
@@ -103,13 +103,14 @@
                         </li>
 
                         {{-- Mercado Pago --}}
-                        <li x-data="{ open: false }">
-                            <button class="w-full flex justify-center bg-gray-100 py-2 rounded-lg shadow"
+                        <li>
+                            {{-- <button class="w-full flex justify-center bg-gray-100 py-2 rounded-lg shadow"
                                 x-on:click="open = !open">
                                 <img class="h-8"
                                     src="https://spurgeon.ar/wp-content/uploads/2023/01/version-horizontal-large-logo-mercado-pago-1024x267.webp"
                                     alt="">
-                            </button>
+                            </button> --}}
+                            <div id="wallet_container"></div>
                         </li>
 
                         {{-- PayU --}}
@@ -129,12 +130,10 @@
     </div>
 
     @push('js')
-
         {{-- <script type="text/javascript" src="{{ config('services.niubiz.url_js') }}"></script> --}}
         <script type="text/javascript" src="https://static-content-qas.vnforapps.com/env/sandbox/js/checkout.js"></script>
 
         <script>
-
             document.addEventListener('DOMContentLoaded', function(event) {
 
                 let purchasenumber = Math.floor(Math.random() * 1000000000);
@@ -161,7 +160,7 @@
         <script src="https://www.paypal.com/sdk/js?client-id={{ config('services.paypal.client_id') }}&currency=USD"></script>
         <script>
             paypal.Buttons({
-                createOrder(){
+                createOrder() {
                     return axios.post("{{ route('paid.createPaypalOrder') }}")
                         .then(res => {
                             return res.data.id;
@@ -170,20 +169,36 @@
                             console.error(err);
                         });
                 },
-                onApprove(data){
-                    
+                onApprove(data) {
+
                     return axios.post("{{ route('paid.capturePaypalOrder') }}", {
-                        orderId: data.orderID
-                    })
-                    .then(res => {
-                        window.location.href = "{{ route('gracias') }}";
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
+                            orderId: data.orderID
+                        })
+                        .then(res => {
+                            window.location.href = "{{ route('gracias') }}";
+                        })
+                        .catch(err => {
+                            console.error(err);
+                        });
 
                 },
             }).render('#paypal-button-container');
+        </script>
+
+        {{-- SDK MercadoPago.js --}}
+        <script src="https://sdk.mercadopago.com/js/v2"></script>
+        <script>
+            const mp = new MercadoPago("{{ config('services.mercadopago.public_key') }}");
+            const bricksBuilder = mp.bricks();
+
+            mp.bricks().create("wallet", "wallet_container", {
+                initialization: {
+                    preferenceId: "{{ $preferenceId }}",
+                },
+                customization: {
+                    theme: 'default',
+                }
+            });
         </script>
     @endpush
 
