@@ -92,13 +92,13 @@
 
                         {{-- PayPal --}}
                         <li x-data="{ open: false }">
-                            <button class="w-full flex justify-center bg-gray-100 py-2 rounded-lg shadow"
+                            <button x-show="!open" class="w-full flex justify-center bg-gray-100 py-2 rounded-lg shadow"
                                 x-on:click="open = !open">
                                 <img class="h-8" src="https://codersfree.com/img/payments/paypal.png" alt="">
                             </button>
 
-                            <div class="pt-6 mb-4" x-show="open" style="display: none;">
-                                <p>Aquí se mostrará las opciones de PayPal</p>
+                            <div class="py-4" x-show="open" style="display: none;">
+                                <div id="paypal-button-container"></div>
                             </div>
                         </li>
 
@@ -155,6 +155,35 @@
                     }
                 });
             });
+        </script>
+
+        {{-- SDK PayPal --}}
+        <script src="https://www.paypal.com/sdk/js?client-id={{ config('services.paypal.client_id') }}&currency=USD"></script>
+        <script>
+            paypal.Buttons({
+                createOrder(){
+                    return axios.post("{{ route('paid.createPaypalOrder') }}")
+                        .then(res => {
+                            return res.data.id;
+                        })
+                        .catch(err => {
+                            console.error(err);
+                        });
+                },
+                onApprove(data){
+                    
+                    return axios.post("{{ route('paid.capturePaypalOrder') }}", {
+                        orderId: data.orderID
+                    })
+                    .then(res => {
+                        window.location.href = "{{ route('gracias') }}";
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+
+                },
+            }).render('#paypal-button-container');
         </script>
     @endpush
 

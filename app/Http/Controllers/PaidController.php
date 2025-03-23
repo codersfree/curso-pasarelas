@@ -70,4 +70,66 @@ class PaidController extends Controller
 
         return $response;
     }
+
+    public function createPaypalOrder()
+    {
+        $accessToken = $this->generateAccessToken();
+        $url = config('services.paypal.url') . '/v2/checkout/orders';
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->post($url, [
+            'intent' => 'CAPTURE',
+            'purchase_units' => [
+                [
+                    'amount' => [
+                        'currency_code' => 'USD',
+                        'value' => '100.00',
+                    ],
+                ],
+            ]
+        ])->json();
+
+        return $response;
+    }
+
+    public function capturePaypalOrder(Request $request)
+    {
+        $orderId = $request->orderId;
+
+        $accessToken = $this->generateAccessToken();
+        $url = config('services.paypal.url') . '/v2/checkout/orders/' . $orderId . '/capture';
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $accessToken,
+        ])->post($url, [
+            'intent' => 'CAPTURE',
+        ])->json();
+
+        if (!isset($response['status']) || $response['status'] !== 'COMPLETED') {
+            throw new \Exception('Order not completed');
+        }
+
+        //Por aqui puedes realizar acciones en tu sitio web
+
+        return $response;
+    }
+
+    public function generateAccessToken()
+    {
+        $auth = base64_encode(config('services.paypal.client_id') . ':' . config('services.paypal.secret'));
+        $url = config('services.paypal.url') . '/v1/oauth2/token';
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . $auth,
+        ])->asForm()->post($url, [
+            'grant_type' => 'client_credentials',
+        ])->json();
+
+        return $response['access_token'];
+    }
+
+    
 }
